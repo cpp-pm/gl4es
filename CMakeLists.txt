@@ -36,7 +36,7 @@ endif()
 
 
 if(NOT DEFAULT_ES)
-    if(PANDORA)
+    if(PANDORA OR ANDROID)
         set(DEFAULT_ES 1)
     else()
         set(DEFAULT_ES 2)
@@ -48,6 +48,16 @@ if(BCMHOST)
     include_directories(/opt/vc/include /opt/vc/include/interface/vcos/pthreads /opt/vc/include/interface/vmcs_host/linux)
     link_directories(/opt/vc/lib)
     add_definitions(-DBCMHOST)
+endif()
+
+# Android
+if(ANDROID)
+    add_definitions(-DBCMHOST)
+    if(NOT USE_INIT_CONSTRUCTOR)
+        add_definitions(-DNO_INIT_CONSTRUCTOR)
+    endif()
+    set(NOX11 ON)
+    set(NO_GBM ON)
 endif()
 
 # ODROID

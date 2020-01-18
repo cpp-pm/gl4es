@@ -140,6 +140,32 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         glx/streaming.h
         glx/utils.h
     )
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Android")
+    list(APPEND GL_H
+        android_debug.h
+    )
+    include_directories(glx)
+    #    aux_source_directory(glx GLX_SOURCES)
+    #    list(APPEND GL_SOURCES ${GLX_SOURCES})
+    list(APPEND GL_SRC
+        glx/hardext.c
+        glx/gbm.c
+	    glx/glx.c
+	    glx/lookup.c
+        #glx/rpi.c
+	    glx/streaming.c
+        #glx/utils.c
+    )
+    list(APPEND GL_H
+        glx/glx_gbm.h
+        glx/gbmfunc.h
+        glx/drmfunc.h
+        glx/glx.h
+        glx/hardext.h
+        #glx/rpi.h
+        glx/streaming.h
+        #glx/utils.h
+    )
 else()
     message(STATUS "Not on Linux: building without GLX support.")
 endif()
@@ -184,6 +210,8 @@ else()
         else()
             target_link_libraries(GL X11 m dl)
         endif()
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Android")
+        target_link_libraries(GL dl log)
     endif()
     if(USE_CLOCK)
         target_link_libraries(GL rt)

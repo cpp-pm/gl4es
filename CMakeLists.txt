@@ -2,6 +2,31 @@ cmake_minimum_required(VERSION 2.8)
 
 project(gl4es LANGUAGES C)
 
+if(NOT PROJECT_VERSION)
+    file(READ "version.h" ver)
+
+    string(REGEX MATCH "MAJOR ([0-9]*)" _ ${ver})
+    set(ver_major ${CMAKE_MATCH_1})
+
+    string(REGEX MATCH "MINOR ([0-9]*)" _ ${ver})
+    set(ver_minor ${CMAKE_MATCH_1})
+
+    string(REGEX MATCH "REVISION ([0-9]*)" _ ${ver})
+    set(ver_revision ${CMAKE_MATCH_1})
+
+    set(PROJECT_VERSION ${ver_major}.${ver_minor}.${ver_revision})
+endif()
+
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+set(config_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
+set(targets_export_name "${PROJECT_NAME}Targets")
+set(namespace "${PROJECT_NAME}::")
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -220,3 +245,30 @@ create_test(PointSprite pointsprite "0000248810" 20)
 
 create_test_GLES(OpenRA 2 openra "0000031249" 20 "638x478+1+1")
 create_test_GLES(GLSL_lighting 2 glsl_lighting "0000505393" 20)
+
+install(
+    DIRECTORY ${CMAKE_SOURCE_DIR}/include/
+    DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/${PROJECT_NAME}
+    FILES_MATCHING PATTERN "*.h*"
+)
+
+write_basic_package_version_file(
+    "${version_config}" COMPATIBILITY SameMajorVersion
+)
+
+configure_package_config_file(
+    "cmake/template/Config.cmake.in"
+    "${project_config}"
+    INSTALL_DESTINATION "${config_install_dir}"
+)
+
+install(
+    FILES "${project_config}" "${version_config}"
+    DESTINATION "${config_install_dir}"
+)
+
+install(
+    EXPORT "${targets_export_name}"
+    NAMESPACE "${namespace}"
+    DESTINATION "${config_install_dir}"
+)

@@ -161,6 +161,32 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND NOT NO_LOADER)
         glx/streaming.h
         glx/utils.h
     )
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Android")
+    list(APPEND GL_H
+        android_debug.h
+    )
+    include_directories(glx)
+    #    aux_source_directory(glx GLX_SOURCES)
+    #    list(APPEND GL_SOURCES ${GLX_SOURCES})
+    list(APPEND GL_SRC
+        glx/hardext.c
+        glx/gbm.c
+	    glx/glx.c
+	    glx/lookup.c
+        #glx/rpi.c
+	    glx/streaming.c
+        #glx/utils.c
+    )
+    list(APPEND GL_H
+        glx/glx_gbm.h
+        glx/gbmfunc.h
+        glx/drmfunc.h
+        glx/glx.h
+        glx/hardext.h
+        #glx/rpi.h
+        glx/streaming.h
+        #glx/utils.h
+    )
 else()
     include_directories(glx)
     list(APPEND GL_SRC
@@ -201,6 +227,8 @@ else()
         else()
             target_link_libraries(GL X11 m dl)
         endif()
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Android")
+        target_link_libraries(GL dl log)
     endif()
     if(USE_CLOCK)
         target_link_libraries(GL rt)
@@ -209,12 +237,13 @@ else()
     if(CMAKE_SHARED_LIBRARY_SUFFIX MATCHES ".so")
         set_target_properties(GL PROPERTIES SUFFIX ".so.1")
     endif()
-    install(TARGETS GL
-    LIBRARY
-      DESTINATION "/usr/lib/gl4es/"
-    )
-  install(FILES "../include/gl4esinit.h" "../include/gl4eshint.h"
-    DESTINATION "/usr/include/gl4es/"
-    )
-  endif()
+endif()
 
+install(TARGETS GL
+    EXPORT "${targets_export_name}"
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    FRAMEWORK DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+)

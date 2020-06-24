@@ -162,6 +162,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND NOT NO_LOADER)
         glx/utils.h
     )
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Android")
+    add_definitions(-include android_debug.h)
     list(APPEND GL_H
         android_debug.h
     )

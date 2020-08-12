@@ -64,7 +64,7 @@ endif()
 
 
 if(NOT DEFAULT_ES)
-    if(PANDORA OR ANDROID)
+    if(PANDORA OR ANDROID OR IOS)
         set(DEFAULT_ES 1)
     else()
         set(DEFAULT_ES 2)
@@ -98,6 +98,12 @@ if(ANDROID)
     endif()
     set(NOX11 ON)
     set(NO_GBM ON)
+endif()
+
+# iOS
+if(IOS)
+    set(NOX11 ON)
+    set(NOEGL ON)
 endif()
 
 # ODROID
